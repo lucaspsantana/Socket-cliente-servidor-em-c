@@ -20,7 +20,7 @@ void* comunicacao(void* c){
 	int length;
 	char IP_servidor[] = "127.0.0.1";
 
-	servidorPorta = 3000;
+	servidorPorta = 5005;
     
 	while(1){
 	socket_id=socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -52,16 +52,15 @@ void* calcularPosicao(void* a){
 	//Definindo variáveis
     
 	while(1){
-    	//utilizando as funções cos, sin e pow da biblioteca math.h para calcular o cosseno, seno e potencia, respectivamente:
-    	x = 0.5*pow(cos(0),2)*(pow(N,2)-pow(N0,2));
-    	y = 0.5*pow(sin(0),2)*(pow(N,2)-pow(N0,2));
+    	x = 0.5*cos(270)*(pow(N,2)-pow(N0,2));
+    	y = 0.5*sin(270)*(pow(N,2)-pow(N0,2));
+
     	N0=N;
     	N = 1.07 * k;
     	k++;
-   	 
-    	sprintf(mensagem, "MB3: %f,%f\n", x,y);
-    	printf("MB3: %f,%f\n", x,y);
-  	 
+
+    	sprintf(mensagem, "MB4: %f,%f.\n", x,y);
+    
     	usleep(90000);
    	 
 	}
@@ -70,14 +69,15 @@ void* calcularPosicao(void* a){
 
 int main(){
     
+    
 	pthread_t th_id1;
 	pthread_t th_id2;
-    
     
 	pthread_create(&th_id1, NULL, &comunicacao, NULL);
 	pthread_create(&th_id2, NULL, &calcularPosicao, NULL);
     
  	while(1){
+    	fputc('-',stderr);
     	usleep(50000);
 	}
     
