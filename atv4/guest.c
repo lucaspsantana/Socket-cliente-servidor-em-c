@@ -13,35 +13,24 @@ float x,y;
 
 char mensagem[100] = "";
 
-void* comunicacao(void* c,  char *IP_servidor, unsigned short servidorPorta){
+void* comunicacao(void* c){
+	int socket_id;
+	struct sockaddr name;
+	char* socket_name;
+	socket_name = "/tmp/socket1";
+
+	int length;
 	
-    int socket_id;
-    struct sockaddr_in servidorAddr;
-    int length;
-   
-	while(1){
-	socket_id=socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-	if(socket_id<0){
-    	fprintf(stderr, "Erro na criação do socket!\n");
-    	exit(0);
-	}
-	//scanf("%s", &mensagem);
-    
-	memset(&servidorAddr, 0, sizeof(servidorAddr));
-	servidorAddr.sin_family = AF_INET;
-	servidorAddr.sin_addr.s_addr = inet_addr(IP_servidor);
-	servidorAddr.sin_port = htons(servidorPorta);   
-    
-	if(connect(socket_id, (struct sockaddr*) &servidorAddr, sizeof(servidorAddr))<0){
-    	fprintf(stderr, "Erro na conexão!\n");
-    	exit(0);
-	}
-    
+	//memset(&name, 0, sizeof(name));
+    socket_id = socket(PF_LOCAL,SOCK_STREAM,0);
+    name.sa_family = AF_LOCAL;
+    strcpy(name.sa_data,socket_name);
+    connect(socket_id, &name, sizeof(name));
+
 	length = strlen(mensagem) +1;
 	write(socket_id, &length, sizeof(length));
 	write(socket_id, mensagem, length);
-    
-	}
+   
 	close(socket_id);
 }
 
@@ -56,8 +45,8 @@ void* calcularPosicao(void* a){
     	N = 1.07 * k;
     	k++;
    	 
-    	sprintf(mensagem, "MB2: %f,%f\n", x,y);
-    	printf("MB2: %f,%f\n", x,y);
+    	sprintf(mensagem, "MB1: %f,%f\n", x,y);
+    	printf("MB1: %f,%f\n", x,y);
   	 
     	usleep(90000);
    	 
@@ -65,31 +54,16 @@ void* calcularPosicao(void* a){
 	return NULL;
 }
 
-
-int main(int argc, char* const argv[]){
-    
+int main(){
     
 	pthread_t th_id1;
 	pthread_t th_id2;
     
-	//char c = 'A';
-	 
-	 char *IP_servidor;
-	unsigned short servidorPorta;
-
     
-    void *c;
-    IP_servidor = argv[1];
-    servidorPorta = atoi(argv[2]);
-    //mensagem = argv[3];
-    
-    
-	printf("-------");
-	pthread_create(&th_id1, NULL, comunicacao(c,IP_servidor,servidorPorta), NULL);
+	pthread_create(&th_id1, NULL, &comunicacao, NULL);
 	pthread_create(&th_id2, NULL, &calcularPosicao, NULL);
     
  	while(1){
-    	fputc('-',stderr);
     	usleep(50000);
 	}
     
